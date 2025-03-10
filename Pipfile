@@ -1,0 +1,26 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pandas = "*"
+fastapi = "*"
+uvicorn = "*"
+psycopg2-binary = "*"
+sqlalchemy = "*"
+bcrypt = "*"
+numpy = "*"
+scikit-learn = "*"
+gensim = "*"
+nltk = "*"
+pyjwt = "*"
+passlib = {extras = ["bcrypt"], version = "*"}
+dotenv = "*"
+python-jose = {extras = ["cryptography"], version = "*"}
+python-multipart = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"
