@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Response
+from fastapi import APIRouter, HTTPException, Depends, Response, Request
 from sqlalchemy.orm import Session
 from utils import create_access_token
 from models import Dealer
@@ -36,8 +36,8 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     )
 
     # Добавляем токен в куки
-    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, max_age=3600)
-    
+    # response.set_cookie(key="access_token", value=access_token, httponly=True,  max_age=3600)
+    response.set_cookie(key="access_token", value=access_token, httponly=True, max_age=3600, samesite="None", secure=True)
     # Возвращаем успешный ответ, не включая токен в теле
     return {"message": "Login successful"}
 
@@ -46,5 +46,12 @@ async def logout(response: Response):
     """
     Выход, удаление cookies.
     """
-    response.delete_cookie(key="access_token")  # Удаляем куку с токеном
+    response.delete_cookie("access_token", httponly=True, samesite="None", secure=True)
     return {"message": "Successfully logged out"}
+
+@router.get("/status")
+def auth_status(request: Request):
+    token = request.cookies.get("access_token")
+    if token:
+        return {"isAuthenticated": True}
+    return {"isAuthenticated": False}

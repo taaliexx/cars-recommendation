@@ -20,8 +20,16 @@ def get_cars_for_sale(db: Session = Depends(get_db)):
     """
     cars_for_sale = db.query(CarsForSale).limit(10).all()
     return [{"id": str(car.id), 
-             "manufacturer name": car.manufacturer_name, 
-             "model": car.model_name} for car in cars_for_sale]
+             "manufacturer_name": car.manufacturer_name, 
+             "model": car.model_name,
+             "year_produced": car.year_produced,
+             "odometer_value": car.odometer_value,
+             "previous_owners": car.previous_owners,
+             "color": car.color,
+             "transmission": car.transmission,
+             "engine_type": car.engine_type,
+             "body_type": car.body_type,
+             "price_usd": car.price_usd} for car in cars_for_sale]
 
 @router.get("/dealers_cars", response_model=List[dict])
 def get_dealers_cars(dealer_id: str = Depends(verify_token_from_cookie), db: Session = Depends(get_db)):
