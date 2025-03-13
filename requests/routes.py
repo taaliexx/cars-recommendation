@@ -1,10 +1,10 @@
-from fastapi import Depends, APIRouter, UploadFile, File, HTTPException
+from fastapi import Depends, APIRouter, UploadFile, File, HTTPException, status
 from sqlalchemy.orm import Session
 from database import get_db
-from models import Dealer, CarsForSale, SoldCars
+from models import Dealer, CarsForSale, SoldCars, Recommendations
 from typing import List
 from recommendations import get_knn_recommendations, save_recommendations_to_db
-from schemas import RecommendationBase
+from schemas import RecommendationBase, DealerInfo
 import uuid
 import logging 
 import pandas as pd
@@ -31,10 +31,26 @@ def get_cars_for_sale(db: Session = Depends(get_db)):
              "body_type": car.body_type,
              "price_usd": car.price_usd} for car in cars_for_sale]
 
+@router.get("/dealer_info", response_model=DealerInfo)
+def get_dealer_info(dealer_id: str = Depends(verify_token_from_cookie), db: Session = Depends(get_db)):
+    """
+    Получить информацию о дилере
+    """
+    dealer_id = uuid.UUID(dealer_id)
+    dealer = db.query(Dealer).filter(Dealer.id == dealer_id).first()
+    
+    if not dealer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Dealer not found"
+        )
+    
+    return dealer
+
 @router.get("/dealers_cars", response_model=List[dict])
 def get_dealers_cars(dealer_id: str = Depends(verify_token_from_cookie), db: Session = Depends(get_db)):
     """
-    Cписок машин, проданных конкретным дилером.
+    Информация о дилере
     """
     dealer_id = uuid.UUID(dealer_id)
     sold_cars = (
@@ -44,8 +60,7 @@ def get_dealers_cars(dealer_id: str = Depends(verify_token_from_cookie), db: Ses
     
     return [
         {
-            "id": str(car.id),
-            "manufacturer_name": car.manufacturer_name,
+            "name": car.manufacturer_name,
             "model_name": car.model_name,
             "transmission": car.transmission,
             "year_produced": car.year_produced,
@@ -78,7 +93,7 @@ async def get_recommendations(db: Session = Depends(get_db), dealer_id: Dealer =
     # Преобразуем типы данных, если необходимо, и удаляем NaN
     recommendations = recommendations.dropna()
     # recommendations = recommendations.sort_values(by=['distance'], ascending=True)
-    recommendations = recommendations.head(10)
+    recommendations = recommendations.head(20)
 
     # Преобразуем DataFrame в список словарей, чтобы вернуть его как JSON
     recommendations_dict = recommendations.to_dict(orient='records')
@@ -148,3 +163,49 @@ async def upload_sales(file: UploadFile = File(...),
         raise HTTPException(status_code=500, detail="Ошибка сервера при обработке файла")
 
     return {"message": f"{len(df)} записей успешно загружены"}
+
+from typing import List
+from fastapi import HTTPException, status, Depends
+from sqlalchemy.orm import Session
+import uuid
+from datetime import datetime
+
+@router.get("/dealers_previous_recommendations", response_model=List[dict])
+def dealers_previous_recommendations(dealer_id: str = Depends(verify_token_from_cookie), db: Session = Depends(get_db)):
+    """
+    Получить информацию о рекомендованных автомобилях для дилера
+    """
+    dealer_id = uuid.UUID(dealer_id)
+    
+    # Query recommendations and join with CarsForSale to get car details, including predicted_price from Recommendations table
+    previous_recommended_cars = (
+        db.query(CarsForSale, Recommendations.predicted_price)  # Select car details and predicted_price from Recommendations
+        .join(Recommendations, Recommendations.recommended_car_id == CarsForSale.id)
+        .filter(Recommendations.dealer_id == dealer_id)
+        .all()
+    )
+    
+    # If no recommended cars found, raise 404 error
+    if not previous_recommended_cars:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No recommended cars found for this dealer"
+        )
+    
+    # Generate the list of recommended cars with predicted_price from Recommendations
+    return [
+        {
+            "name": car.manufacturer_name,
+            "model_name": car.model_name,
+            "transmission": car.transmission,
+            "year_produced": car.year_produced,
+            "odometer_value": car.odometer_value,
+            "price_usd": car.price_usd,
+            "engine_type": car.engine_type,
+            "body_type": car.body_type,
+            "color": car.color,
+            "previous_owners": car.previous_owners,
+            "predicted_price": predicted_price,  # Fetch predicted_price from Recommendations table
+        }
+        for car, predicted_price in previous_recommended_cars
+    ]

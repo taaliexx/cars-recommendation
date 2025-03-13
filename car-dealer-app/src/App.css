@@ -15,6 +15,7 @@ button {
     background-color: #4CAF50;
     color: white;
     border: none;
+    border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
 }
@@ -50,26 +51,54 @@ button:hover {
 }
 
 .modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
 
+/* Контейнер модального окна */
 .modal-content {
   background-color: white;
-  padding: 30px;
+  padding: 20px;
   border-radius: 8px;
-  width: 400px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  text-align: left;
+  width: 400px;  /* Ширина модального окна */
+  max-width: 100%;  /* Чтобы окно не вылазило за пределы экрана */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тень */
+  text-align: center;  /* Выравнивание текста по центру */
 }
+
+/* Формы и инпуты в модальном окне */
+input[type="text"], input[type="password"] {
+  width: 100%;  /* Делаем ширину полей ввода на 100%, чтобы они заполнили доступное пространство */
+  padding: 12px 15px;  /* Увеличиваем внутренние отступы для удобства */
+  margin: 12px 0;  /* Добавляем отступы сверху и снизу */
+  border-radius: 8px;  /* Скругляем углы для более мягкого вида */
+  border: 1px solid #ccc;  /* Тонкая рамка серого цвета */
+  font-size: 16px;  /* Увеличиваем размер шрифта для лучшей читаемости */
+  box-sizing: border-box;  /* Учитываем паддинги и бордеры в общей ширине */
+  transition: all 0.3s ease;  /* Плавный переход для всех изменений */
+}
+
+/* Эффект фокуса на инпутах */
+input[type="text"]:focus, input[type="password"]:focus {
+  border-color: #3498db;  /* Цвет рамки при фокусе */
+  outline: none;  /* Убираем стандартную обводку браузера */
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.8);  /* Легкая тень вокруг инпута */
+}
+
+/* Для текста плейсхолдера */
+input[type="text"]::placeholder, input[type="password"]::placeholder {
+  color: #aaa;  /* Цвет плейсхолдера */
+  font-style: italic;  /* Сделаем плейсхолдер курсивом для улучшения восприятия */
+}
+
 
 .close {
   position: absolute;
@@ -80,32 +109,56 @@ button:hover {
 }
 
 form div {
-  margin-bottom: 15px;
+    margin-bottom: 15px;
 }
 
-label {
-  display: block;
-  margin-bottom: 5px;
+.spinner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
+  padding: 20px;
+  border-radius: 10px;
 }
 
-input {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.loading-spinner {
+  border: 4px solid #f3f3f3; /* Светлый фон */
+  border-top: 4px solid #3498db; /* Цвет спиннера */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
 }
 
-button[type="submit"] {
-  width: 100%;
-  padding: 10px;
-  background-color: #4CAF50;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinner p {
+  margin-top: 10px;
+  color: white;
+  font-size: 16px;
+}
+
+.back-to-all-cars-btn {
+  padding: 10px 20px;
+  background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  margin-top: auto;  /* Это заставит кнопку "прилипнуть" к низу контейнера */
 }
 
-button[type="submit"]:hover {
-  background-color: #45a049;
+.back-to-all-cars-btn:hover {
+  background-color: #0056b3;
 }
