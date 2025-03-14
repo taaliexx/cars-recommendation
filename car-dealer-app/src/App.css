@@ -1,6 +1,8 @@
 /* App.css */
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600&display=swap');
+
 .app {
-    font-family: Arial, sans-serif;
+    font-family: 'Exo 2', 'Montserrat';
     padding: 20px;
     text-align: center;
 }
@@ -10,9 +12,10 @@
 }
 
 button {
+    font-family: 'Exo 2', sans-serif;
     margin: 10px;
     padding: 10px 20px;
-    background-color: #4CAF50;
+    background-color: #756d65;
     color: white;
     border: none;
     border-radius: 5px;
@@ -21,7 +24,7 @@ button {
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #38322b;
 }
 
 .car-list {
@@ -76,6 +79,7 @@ button:hover {
 
 /* Формы и инпуты в модальном окне */
 input[type="text"], input[type="password"] {
+  font-family: 'Exo 2', sans-serif;
   width: 100%;  /* Делаем ширину полей ввода на 100%, чтобы они заполнили доступное пространство */
   padding: 12px 15px;  /* Увеличиваем внутренние отступы для удобства */
   margin: 12px 0;  /* Добавляем отступы сверху и снизу */
@@ -88,9 +92,9 @@ input[type="text"], input[type="password"] {
 
 /* Эффект фокуса на инпутах */
 input[type="text"]:focus, input[type="password"]:focus {
-  border-color: #3498db;  /* Цвет рамки при фокусе */
+  border-color: #756d65;  /* Цвет рамки при фокусе */
   outline: none;  /* Убираем стандартную обводку браузера */
-  box-shadow: 0 0 5px rgba(52, 152, 219, 0.8);  /* Легкая тень вокруг инпута */
+  box-shadow: 0 0 5px #756d65;  /* Легкая тень вокруг инпута */
 }
 
 /* Для текста плейсхолдера */
@@ -129,7 +133,7 @@ form div {
 
 .loading-spinner {
   border: 4px solid #f3f3f3; /* Светлый фон */
-  border-top: 4px solid #3498db; /* Цвет спиннера */
+  border-top: 4px solid #5d845e; /* Цвет спиннера */
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -149,7 +153,7 @@ form div {
 
 .back-to-all-cars-btn {
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: #5d845e;
   color: white;
   border: none;
   border-radius: 5px;
@@ -160,5 +164,116 @@ form div {
 }
 
 .back-to-all-cars-btn:hover {
-  background-color: #0056b3;
+  background-color: #7da27e;
+}
+
+/* Контейнер формы добавления автомобиля */
+.add-car-form {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: all 0.3s ease-in-out;
+}
+
+.add-car-form:hover {
+  transform: translateY(-5px); /* Легкое поднятие формы при наведении */
+}
+
+/* Заголовок формы */
+.add-car-form h2 {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+/* Стиль для каждой строки формы */
+.add-car-form div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Подписи для инпутов */
+.add-car-form label {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #444;
+}
+
+/* Стиль для инпутов */
+.add-car-form input[type="text"], .add-car-form input[type="number"], .add-car-form select {
+  font-family: 'Exo 2', sans-serif;
+  width: 80%;                  /* Ширина инпутов 80% */
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  background-color: #f9f9f9;
+  transition: all 0.3s ease;
+  margin: 0 auto;              /* Горизонтальное выравнивание */
+  display: block;              /* Важное свойство для блокового уровня */
+}
+
+.add-car-form input[type="text"]:focus, .add-car-form input[type="number"]:focus, .add-car-form select:focus {
+  border-color: #756d65; /* Цвет рамки при фокусе */
+  width: 90%;
+  box-shadow: 0 0 5px #756d65; /* Легкая тень при фокусе */
+  outline: none;  /* Убираем стандартную обводку */
+}
+
+.add-car-form input::placeholder {
+  color: #aaa; /* Цвет плейсхолдера */
+}
+
+/* Стиль кнопки для отправки формы */
+.add-car-form button[type="submit"] {
+  background-color: #5d845e;
+  color: white;
+  padding: 12px 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 20%; 
+}
+
+.add-car-form button[type="submit"]:hover {
+  background-color: #7da27e; /* Темнее синий при наведении */
+}
+
+.add-car-form button[type="submit"]:disabled {
+  background-color: #b0bec5; /* Серый цвет для неактивной кнопки */
+  cursor: not-allowed;
+}
+
+/* Стиль для кнопки "Назад" */
+.add-car-form .back-button {
+  background-color: #9E9E9E;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-car-form .back-button:hover {
+  background-color: #757575;
+}
+
+/* Выравнивание формы по центру */
+.add-car-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f4f4f9;
 }

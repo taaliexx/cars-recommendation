@@ -15,10 +15,35 @@ function App() {
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [showSoldCars, setShowSoldCars] = useState(false); // Флаг для отображения проданных машин
   const [showPreviousRecommendations, setShowPreviousRecommendations] = useState(false); // Флаг для отображения предыдущих рекомендаций
+  const [isAddCarFormOpen, setIsAddCarFormOpen] = useState(false);
+  const [newCar, setNewCar] = useState({
+    manufacturer_name: '',
+    model_name: '',
+    year_produced: '',
+    odometer_value: '',
+    price_usd: '',
+    transmission: 'automatic',
+    engine_type: 'gasoline',
+    body_type: 'universal',
+    color: 'silver',
+    previous_owners: '1'
+  });
+
+  const transmissionOptions = ['automatic', 'manual'];
+  const engineTypeOptions = ['gasoline', 'diesel'];
+  const bodyTypeOptions = [
+    'universal', 'suv', 'sedan', 'hatchback', 'liftback', 'minivan',
+    'minibus', 'van', 'pickup', 'coupe', 'cabriolet', 'limousine', 'other'
+  ];
+  const colorOptions = [
+    'silver', 'blue', 'red', 'black', 'grey', 'brown', 'white', 'green',
+    'violet', 'orange', 'yellow', 'other'
+  ];
+  const previousOwnersOptions = ['1', '2', '3', 'more than 3'];
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-  
+
   // Проверка авторизации при загрузке страницы
   useEffect(() => {
     const checkAuth = async () => {
@@ -157,6 +182,34 @@ function App() {
     setShowPreviousRecommendations(false);  // Скрываем предыдущие рекомендации
   };
 
+  // const formattedDate = new Date(dealerInfo.created_at).toLocaleDateString("en-EN", {
+  //   year: "numeric",
+  //   month: "long",
+  //   day: "numeric"
+  // });
+
+  const handleAddCar = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post("http://127.0.0.1:8000/add_dealer_car", newCar, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      alert("Машина успешно добавлена!");
+      setIsAddCarFormOpen(false);
+      fetchSoldCars();
+    } catch (error) {
+      alert("Ошибка при добавлении машины.");
+      console.error(error);
+    }
+  };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewCar({ ...newCar, [name]: value });
+  };
+
   return (
     <div className="app">
       <h1>Cars for Sale</h1>
@@ -211,10 +264,101 @@ function App() {
             <div>
               <p><strong>Name:</strong> {dealerInfo.name}</p>
               <p><strong>Email:</strong> {dealerInfo.email}</p>
-              <p><strong>You are with us since:</strong> {dealerInfo.created_at}</p>
+              {/* <p><strong>You are with us since:</strong> {formattedDate}</p> */}
             </div>
           ) : (
             <p>Loading your account information...</p>
+          )}
+          <button onClick={() => setIsAddCarFormOpen(true)}>Add Car</button>
+
+          {isAddCarFormOpen && (
+            <div className="add-car-form">
+              <form onSubmit={handleAddCar}>
+                {/* Manufacturer Name */}
+                <div>
+                  <label>Manufacturer Name:</label>
+                  <input type="text" name="manufacturer_name" value={newCar.manufacturer_name} onChange={handleInputChange} required />
+                </div>
+
+                {/* Model Name */}
+                <div>
+                  <label>Model Name:</label>
+                  <input type="text" name="model_name" value={newCar.model_name} onChange={handleInputChange} required />
+                </div>
+
+                {/* Year Produced */}
+                <div>
+                  <label>Year Produced:</label>
+                  <input type="number" name="year_produced" value={newCar.year_produced} onChange={handleInputChange} required />
+                </div>
+
+                {/* Odometer Value */}
+                <div>
+                  <label>Odometer Value:</label>
+                  <input type="number" name="odometer_value" value={newCar.odometer_value} onChange={handleInputChange} required />
+                </div>
+
+                {/* Price USD */}
+                <div>
+                  <label>Price USD:</label>
+                  <input type="number" name="price_usd" value={newCar.price_usd} onChange={handleInputChange} required />
+                </div>
+
+                {/* Transmission */}
+                <div>
+                  <label>Transmission:</label>
+                  <select name="transmission" value={newCar.transmission} onChange={handleInputChange}>
+                    {transmissionOptions.map((option) => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Engine Type */}
+                <div>
+                  <label>Engine Type:</label>
+                  <select name="engine_type" value={newCar.engine_type} onChange={handleInputChange}>
+                    {engineTypeOptions.map((option) => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Body Type */}
+                <div>
+                  <label>Body Type:</label>
+                  <select name="body_type" value={newCar.body_type} onChange={handleInputChange}>
+                    {bodyTypeOptions.map((option) => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Color */}
+                <div>
+                  <label>Color:</label>
+                  <select name="color" value={newCar.color} onChange={handleInputChange}>
+                    {colorOptions.map((option) => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Previous Owners */}
+                <div>
+                  <label>Previous Owners:</label>
+                  <select name="previous_owners" value={newCar.previous_owners} onChange={handleInputChange}>
+                    {previousOwnersOptions.map((option) => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Submit */}
+                <button type="submit">Add Car</button>
+                <button type="button" onClick={() => setIsAddCarFormOpen(false)}>Cancel</button>
+              </form>
+            </div>
           )}
           <button onClick={fetchSoldCars}>My Sold Cars</button>
           <button onClick={fetchRecommendedCars}>Previous Recommendations</button>
