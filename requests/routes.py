@@ -18,7 +18,7 @@ def get_cars_for_sale(db: Session = Depends(get_db)):
     """
     Cписок всех машин, которые можно приобрести для дальнейшей продажи.
     """
-    cars_for_sale = db.query(CarsForSale).limit(10).all()
+    cars_for_sale = db.query(CarsForSale).limit(1000).all()
     return [{"id": str(car.id), 
              "manufacturer_name": car.manufacturer_name, 
              "model": car.model_name,

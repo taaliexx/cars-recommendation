@@ -29,6 +29,22 @@ function App() {
     previous_owners: '1'
   });
 
+  const [filteredCars, setFilteredCars] = useState([]);  // Массив для отфильтрованных машин
+  const [showFilters, setShowFilters] = useState(true);
+  const [filters, setFilters] = useState({
+    manufacturer_name: '',
+    model: '',
+    year_produced: '',
+    min_price: '',
+    max_price: '',
+    min_odometer: '',
+    max_odometer: '',
+    transmission: 'automatic',
+    engine_type: 'gasoline',
+    body_type: 'universal',
+    color: 'silver'
+  });
+
   const transmissionOptions = ['automatic', 'manual'];
   const engineTypeOptions = ['gasoline', 'diesel'];
   const bodyTypeOptions = [
@@ -59,10 +75,64 @@ function App() {
 
     // Получение списка машин
     axios.get("http://127.0.0.1:8000/cars_for_sale")
-      .then(res => setCars(res.data))
+      .then(res => { setCars(res.data); setFilteredCars(res.data); })
       .catch(console.error);
   }, []);
 
+  // Функция для обработки изменения значений фильтров
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters({
+      ...filters,
+      [name]: value
+    });
+  };
+
+  // Фильтрация машин
+  const filterCars = () => {
+    let filtered = cars;
+
+    // Фильтрация по каждому полю
+    if (filters.manufacturer_name) {
+      filtered = filtered.filter(car =>
+        car.manufacturer_name && car.manufacturer_name.toLowerCase().includes(filters.manufacturer_name.toLowerCase())
+      );
+    }
+    if (filters.model_name) {
+      filtered = filtered.filter(car =>
+        car.model && car.model.toLowerCase().includes(filters.model_name.toLowerCase())
+      );
+    }
+    if (filters.year_produced) {
+      filtered = filtered.filter(car => car.year_produced === parseInt(filters.year_produced));
+    }
+    if (filters.min_price) {
+      filtered = filtered.filter(car => car.price_usd >= parseFloat(filters.min_price));
+    }
+    if (filters.max_price) {
+      filtered = filtered.filter(car => car.price_usd <= parseFloat(filters.max_price));
+    }
+    if (filters.min_odometer) {
+      filtered = filtered.filter(car => car.odometer_value >= parseFloat(filters.min_odometer));
+    }
+    if (filters.max_odometer) {
+      filtered = filtered.filter(car => car.odometer_value <= parseFloat(filters.max_odometer));
+    }
+    if (filters.transmission) {
+      filtered = filtered.filter(car => car.transmission === filters.transmission);
+    }
+    if (filters.engine_type) {
+      filtered = filtered.filter(car => car.engine_type === filters.engine_type);
+    }
+    if (filters.body_type) {
+      filtered = filtered.filter(car => car.body_type === filters.body_type);
+    }
+    if (filters.color) {
+      filtered = filtered.filter(car => car.color === filters.color);
+    }
+
+    setFilteredCars(filtered);
+  };
   // Логин
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -132,6 +202,7 @@ function App() {
       setShowRecommendations(true);
       setShowSoldCars(false);  // Скрываем проданные машины при показе рекомендаций
       setShowPreviousRecommendations(false);  // Скрываем предыдущие рекомендации
+      setShowFilters(false);
     } catch (error) {
       alert("Ошибка при получении рекомендаций.");
       console.error(error);
@@ -144,6 +215,7 @@ function App() {
     setShowMyAccount(true);
     setShowRecommendations(false);  // Прячем рекомендации
     fetchDealerInfo();  // Загружаем информацию о дилере
+    setShowFilters(false);
   };
 
   // Получение проданных машин
@@ -153,6 +225,7 @@ function App() {
       setSoldCars(response.data);
       setShowSoldCars(true);  // Показываем проданные машины
       setShowPreviousRecommendations(false);  // Скрываем предыдущие рекомендации
+      setShowFilters(false);
     } catch (error) {
       alert("Ошибка при получении проданных машин.");
       console.error(error);
@@ -166,6 +239,7 @@ function App() {
       setRecommendedCars(response.data);
       setShowPreviousRecommendations(true);  // Показываем предыдущие рекомендации
       setShowSoldCars(false);  // Скрываем проданные машины
+      setShowFilters(false);
     } catch (error) {
       alert("Ошибка при получении рекомендованных машин.");
       console.error(error);
@@ -180,7 +254,9 @@ function App() {
     setRecommendedCars([]);  // Очистка рекомендованных машин
     setShowSoldCars(false);  // Скрываем проданные машины
     setShowPreviousRecommendations(false);  // Скрываем предыдущие рекомендации
+    setShowFilters(true);
   };
+
 
   // const formattedDate = new Date(dealerInfo.created_at).toLocaleDateString("en-EN", {
   //   year: "numeric",
@@ -227,7 +303,101 @@ function App() {
           </>
         )}
       </div>
-
+      {/* Фильтры */}
+      {showFilters && (
+        <div className="filters">
+          <input
+            type="text"
+            name="manufacturer_name"
+            value={filters.manufacturer_name}
+            onChange={handleFilterChange}
+            placeholder="Manufacturer"
+          />
+          <input
+            type="text"
+            name="model_name"
+            value={filters.model_name}
+            onChange={handleFilterChange}
+            placeholder="Model"
+          />
+          <input
+            type="number"
+            name="year_produced"
+            value={filters.year_produced}
+            onChange={handleFilterChange}
+            placeholder="Year"
+          />
+          <input
+            type="number"
+            name="min_price"
+            value={filters.min_price}
+            onChange={handleFilterChange}
+            placeholder="Min Price"
+          />
+          <input
+            type="number"
+            name="max_price"
+            value={filters.max_price}
+            onChange={handleFilterChange}
+            placeholder="Max Price"
+          />
+          <input
+            type="number"
+            name="min_odometer"
+            value={filters.min_odometer}
+            onChange={handleFilterChange}
+            placeholder="Min Odometer"
+          />
+          <input
+            type="number"
+            name="max_odometer"
+            value={filters.max_odometer}
+            onChange={handleFilterChange}
+            placeholder="Max Odometer"
+          />
+          <select
+            name="transmission"
+            value={filters.transmission}
+            onChange={handleFilterChange}
+          >
+            <option value="">All Transmissions</option>
+            {transmissionOptions.map((option) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+          <select
+            name="engine_type"
+            value={filters.engine_type}
+            onChange={handleFilterChange}
+          >
+            <option value="">All Engine Types</option>
+            {engineTypeOptions.map((option) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+          <select
+            name="body_type"
+            value={filters.body_type}
+            onChange={handleFilterChange}
+          >
+            <option value="">All Body Types</option>
+            {bodyTypeOptions.map((option) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+          <select
+            name="color"
+            value={filters.color}
+            onChange={handleFilterChange}
+          >
+            <option value="">All Colors</option>
+            {colorOptions.map((option) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+          <button onClick={filterCars}>Filter</button>
+        </div>
+      )}
       {/* Модальное окно логина */}
       {isModalOpen && (
         <div className="modal">
@@ -283,7 +453,7 @@ function App() {
                 {/* Model Name */}
                 <div>
                   <label>Model Name:</label>
-                  <input type="text" name="model_name" value={newCar.model_name} onChange={handleInputChange} required />
+                  <input type="text" name="modуд" value={newCar.model} onChange={handleInputChange} required />
                 </div>
 
                 {/* Year Produced */}
@@ -308,6 +478,7 @@ function App() {
                 <div>
                   <label>Transmission:</label>
                   <select name="transmission" value={newCar.transmission} onChange={handleInputChange}>
+                    <option value="">All Transmissions</option> {/* Пустое значение */}
                     {transmissionOptions.map((option) => (
                       <option key={option} value={option}>{option}</option>
                     ))}
@@ -318,6 +489,7 @@ function App() {
                 <div>
                   <label>Engine Type:</label>
                   <select name="engine_type" value={newCar.engine_type} onChange={handleInputChange}>
+                    <option value="">All Engine Types</option> {/* Пустое значение */}
                     {engineTypeOptions.map((option) => (
                       <option key={option} value={option}>{option}</option>
                     ))}
@@ -328,6 +500,7 @@ function App() {
                 <div>
                   <label>Body Type:</label>
                   <select name="body_type" value={newCar.body_type} onChange={handleInputChange}>
+                    <option value="">All Body Types</option> {/* Пустое значение */}
                     {bodyTypeOptions.map((option) => (
                       <option key={option} value={option}>{option}</option>
                     ))}
@@ -338,6 +511,7 @@ function App() {
                 <div>
                   <label>Color:</label>
                   <select name="color" value={newCar.color} onChange={handleInputChange}>
+                    <option value="">All Colors</option> {/* Пустое значение */}
                     {colorOptions.map((option) => (
                       <option key={option} value={option}>{option}</option>
                     ))}
@@ -348,6 +522,7 @@ function App() {
                 <div>
                   <label>Previous Owners:</label>
                   <select name="previous_owners" value={newCar.previous_owners} onChange={handleInputChange}>
+                    <option value="">All Owners</option> {/* Пустое значение */}
                     {previousOwnersOptions.map((option) => (
                       <option key={option} value={option}>{option}</option>
                     ))}
@@ -410,18 +585,24 @@ function App() {
       {/* Список машин */}
       <div className="car-list">
         {!showMyAccount && !showRecommendations && (
-          cars.map(car => (
-            <div className="car-card" key={car.id}>
-              <h2>{car.manufacturer_name} {car.model}</h2>
-              <p><strong>Year:</strong> {car.year_produced}</p>
-              <p><strong>Odometer:</strong> {car.odometer_value} km</p>
-              <p><strong>Previous Owners:</strong> {car.previous_owners}</p>
-              <p><strong>Color:</strong> {car.color}</p>
-              <p><strong>Transmission:</strong> {car.transmission}</p>
-              <p><strong>Engine Type:</strong> {car.engine_type}</p>
-              <p><strong>Body Type:</strong> {car.body_type}</p>
-              <p><strong>Price:</strong> ${car.price_usd}</p>
-            </div>
+          // Проверяем, есть ли отфильтрованные машины
+          (filteredCars.length > 0 ? (
+            filteredCars.map(car => (
+              <div className="car-card" key={car.id}>
+                <h2>{car.manufacturer_name} {car.model}</h2>
+                <p><strong>Year:</strong> {car.year_produced}</p>
+                <p><strong>Odometer:</strong> {car.odometer_value} km</p>
+                <p><strong>Previous Owners:</strong> {car.previous_owners}</p>
+                <p><strong>Color:</strong> {car.color}</p>
+                <p><strong>Transmission:</strong> {car.transmission}</p>
+                <p><strong>Engine Type:</strong> {car.engine_type}</p>
+                <p><strong>Body Type:</strong> {car.body_type}</p>
+                <p><strong>Price:</strong> ${car.price_usd}</p>
+              </div>
+            ))
+          ) : (
+            // Если машин нет по текущим фильтрам, выводим сообщение
+            <p>No cars found based on your filters.</p>
           ))
         )}
       </div>
